@@ -16,11 +16,13 @@
 - userPhoneNumber
 - userEmail
 - User Type
+- List<Contacts> blockedContacts
 - registerUser()
 
 **Contact:**
 - Phone Number
 - Contact Type
+- SpamCount
 - addContact()
 - blockContact()
 - unblockContact()
@@ -29,9 +31,11 @@
 - blackListContact()
 
 **Contact Type:**
-- Normal Contact
-- Business Contact
-- Black Listed Contact
+- Normal
+- Business 
+- Black Listed 
+- Blocked 
+- Spam
 
 **User type:**
 - Normal user

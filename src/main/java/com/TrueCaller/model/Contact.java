@@ -16,6 +16,8 @@ public class Contact {
 
     private String phoneNumber;
 
+    private int spamCount;
+
     @Enumerated(EnumType.STRING)
     private ContactType contactType;
 }
