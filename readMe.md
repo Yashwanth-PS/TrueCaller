@@ -34,7 +34,6 @@
 - Normal
 - Business 
 - Black Listed 
-- Blocked 
 - Spam
 
 **User type:**

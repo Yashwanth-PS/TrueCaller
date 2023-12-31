@@ -4,6 +4,5 @@ public enum ContactType {
     NORMAL,
     BUSINESS,
     BLACK_LISTED,
-    BLOCKED,
     SPAM;
 }
