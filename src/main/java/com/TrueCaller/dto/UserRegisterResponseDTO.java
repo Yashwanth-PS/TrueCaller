@@ -9,7 +9,6 @@ import lombok.Setter;
 @Setter
 public class UserRegisterResponseDTO {
     private String name;
-    private String phoneNumber;
     private String email;
     private UserType userType;
     private int responseCode;

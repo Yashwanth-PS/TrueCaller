@@ -6,10 +6,7 @@ import com.TrueCaller.service.ContactService;
 import com.TrueCaller.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/contacts")
@@ -21,8 +18,24 @@ public class ContactController {
     @Autowired
     private ContactService contactService;
 
-    @GetMapping("/contact/block")
+    @PostMapping("/contact/block")
     public ResponseEntity<UserPhoneResponseDTO> blockContact(@RequestBody UserPhoneRequestDTO userPhoneRequestDTO) {
         return contactService.blockContact(userPhoneRequestDTO);
     }
+/* http://localhost:8181/api/contacts/contact/block
+{
+    "userId": "2",
+    "phoneNumber": "9876543210"
+} */
+
+    @PostMapping("/contact/unblock")
+    public ResponseEntity<UserPhoneResponseDTO> unblockContact(@RequestBody UserPhoneRequestDTO userPhoneRequestDTO) {
+        return contactService.unblockContact(userPhoneRequestDTO);
+    }
 }
+
+/* http://localhost:8181/api/contacts/contact/block
+{
+    "userId": "2",
+    "phoneNumber": "9876543210"
+} */

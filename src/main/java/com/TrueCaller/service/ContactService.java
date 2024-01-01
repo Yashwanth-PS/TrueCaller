@@ -13,7 +13,7 @@ public interface ContactService {
 
     ResponseEntity<UserPhoneResponseDTO> blockContact(UserPhoneRequestDTO userPhoneRequestDTO);
 
-    void unblockContact(Long userId, String phoneNumber);
+    ResponseEntity<UserPhoneResponseDTO> unblockContact(UserPhoneRequestDTO userPhoneRequestDTO);
 
     void reportSpam(Long contactId);
 

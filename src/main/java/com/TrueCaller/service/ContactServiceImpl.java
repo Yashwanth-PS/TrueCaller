@@ -17,9 +17,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-import static com.TrueCaller.mapper.UserEntityDTOMaapper.getUserEntityFromUserRegisterRequestDTO;
-import static com.TrueCaller.mapper.UserEntityDTOMaapper.getUserRegisterRsponseDTOFromUserEntity;
-
 @Service
 public class ContactServiceImpl implements ContactService {
 
@@ -59,31 +56,43 @@ public class ContactServiceImpl implements ContactService {
             responseDTO.setName(user.getName());
             responseDTO.setPhoneNumber(userPhoneRequestDTO.getPhoneNumber());
             responseDTO.setResponseCode(200);
-            responseDTO.setResponseMessage("SUCCESS: User Registration Successful");
+            responseDTO.setResponseMessage("SUCCESS: Successfully Blocked the User");
             return ResponseEntity.ok(responseDTO);
         } catch (Exception e) {
             responseDTO.setResponseCode(500);
-            responseDTO.setResponseMessage("Please Use a Valid Email and Password");
+            responseDTO.setResponseMessage("Could Not Block the User");
             return ResponseEntity.status(500).body(responseDTO);
         }
     }
 
     @Override
-    public void unblockContact(Long userId, String phoneNumber) {
-        Optional<User> userOptional = userRepository.findById(userId);
-        if (userOptional.isEmpty()) {
-            throw new UserNotFoundException("This User does not exist");
+    public ResponseEntity<UserPhoneResponseDTO> unblockContact(UserPhoneRequestDTO userPhoneRequestDTO) {
+        UserPhoneResponseDTO responseDTO = new UserPhoneResponseDTO();
+        try { // You may need to implement the actual logic based on your requirements
+            Optional<User> userOptional = userRepository.findById(userPhoneRequestDTO.getUserId());
+            if (userOptional.isEmpty()) {
+                throw new UserNotFoundException("This User does not exist");
+            }
+            Optional<Contact> contactOptional = contactRepository.findByPhoneNumber(userPhoneRequestDTO.getPhoneNumber());
+            if (contactOptional.isEmpty()) {
+                throw new ContactNotFoundException("This Contact does not exist");
+            }
+            if (userOptional.get().getBlockedContacts().stream().parallel().noneMatch(contact -> contact.getId().equals(contactOptional.get().getId()))) {
+                throw new ContactNotFoundException("The Contact is Not Blocked");
+            }
+            User user = userOptional.get();
+            user.getBlockedContacts().remove(contactOptional.get());
+            userRepository.save(user);
+            responseDTO.setName(user.getName());
+            responseDTO.setPhoneNumber(userPhoneRequestDTO.getPhoneNumber());
+            responseDTO.setResponseCode(200);
+            responseDTO.setResponseMessage("SUCCESS: Successfully Unblocked the User");
+            return ResponseEntity.ok(responseDTO);
+        } catch (Exception e) {
+            responseDTO.setResponseCode(500);
+            responseDTO.setResponseMessage("Could Not Unblock the User");
+            return ResponseEntity.status(500).body(responseDTO);
         }
-        Optional<Contact> contactOptional = contactRepository.findByPhoneNumber(phoneNumber);
-        if (contactOptional.isEmpty()) {
-            throw new ContactNotFoundException("This Contact does not exist");
-        }
-        if (userOptional.get().getBlockedContacts().stream().parallel().noneMatch(contact -> contact.getId().equals(contactOptional.get().getId()))) {
-            throw new ContactNotFoundException("The Contact is Not Blocked");
-        }
-        User user = userOptional.get();
-        user.getBlockedContacts().remove(contactOptional.get());
-        userRepository.save(user);
     }
 
     @Override
@@ -104,7 +113,7 @@ public class ContactServiceImpl implements ContactService {
             throw new UserNotFoundException("This User does not exist");
         }
         User user = userOptional.get();
-        if (!user.getUserType().equals(UserType.CONTACT_MANAGER)){
+        if (!user.getUserType().equals(UserType.CONTACT_MANAGER)) {
             throw new IllegalOperationException("Only Contact Manager Can Blacklist a User");
         }
         Optional<Contact> contactOptional = contactRepository.findByPhoneNumber(phoneNumber);

@@ -18,10 +18,11 @@ public class User {
 
     private String name;
 
-    @OneToMany
+    @OneToMany(mappedBy = "user")
     List<Contact> contacts;
 
     private String email;
+
     private String password;
 
     @Enumerated(EnumType.STRING)
