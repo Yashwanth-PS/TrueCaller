@@ -1,5 +1,7 @@
 package com.TrueCaller.service;
 
+import com.TrueCaller.dto.UserPhoneRequestDTO;
+import com.TrueCaller.dto.UserPhoneResponseDTO;
 import com.TrueCaller.exception.ContactNotFoundException;
 import com.TrueCaller.exception.IllegalOperationException;
 import com.TrueCaller.exception.UserNotFoundException;
@@ -10,9 +12,13 @@ import com.TrueCaller.model.constants.UserType;
 import com.TrueCaller.repository.ContactRepository;
 import com.TrueCaller.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+
+import static com.TrueCaller.mapper.UserEntityDTOMaapper.getUserEntityFromUserRegisterRequestDTO;
+import static com.TrueCaller.mapper.UserEntityDTOMaapper.getUserRegisterRsponseDTOFromUserEntity;
 
 @Service
 public class ContactServiceImpl implements ContactService {
@@ -36,18 +42,30 @@ public class ContactServiceImpl implements ContactService {
     }
 
     @Override
-    public void blockContact(Long userId, String phoneNumber) {
-        Optional<User> userOptional = userRepository.findById(userId);
-        if (userOptional.isEmpty()) {
-            throw new UserNotFoundException("This User does not exist");
+    public ResponseEntity<UserPhoneResponseDTO> blockContact(UserPhoneRequestDTO userPhoneRequestDTO) {
+        UserPhoneResponseDTO responseDTO = new UserPhoneResponseDTO();
+        try { // You may need to implement the actual logic based on your requirements
+            Optional<User> userOptional = userRepository.findById(userPhoneRequestDTO.getUserId());
+            if (userOptional.isEmpty()) {
+                throw new UserNotFoundException("This User does not exist");
+            }
+            Optional<Contact> contactOptional = contactRepository.findByPhoneNumber(userPhoneRequestDTO.getPhoneNumber());
+            if (contactOptional.isEmpty()) {
+                throw new ContactNotFoundException("This Contact does not exist");
+            }
+            User user = userOptional.get();
+            user.getBlockedContacts().add(contactOptional.get());
+            userRepository.save(user);
+            responseDTO.setName(user.getName());
+            responseDTO.setPhoneNumber(userPhoneRequestDTO.getPhoneNumber());
+            responseDTO.setResponseCode(200);
+            responseDTO.setResponseMessage("SUCCESS: User Registration Successful");
+            return ResponseEntity.ok(responseDTO);
+        } catch (Exception e) {
+            responseDTO.setResponseCode(500);
+            responseDTO.setResponseMessage("Please Use a Valid Email and Password");
+            return ResponseEntity.status(500).body(responseDTO);
         }
-        Optional<Contact> contactOptional = contactRepository.findByPhoneNumber(phoneNumber);
-        if (contactOptional.isEmpty()) {
-            throw new ContactNotFoundException("This Contact does not exist");
-        }
-        User user = userOptional.get();
-        user.getBlockedContacts().add(contactOptional.get());
-        userRepository.save(user);
     }
 
     @Override

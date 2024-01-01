@@ -17,7 +17,10 @@ public class User {
     private Long id;
 
     private String name;
-    private String phoneNumber;
+
+    @OneToMany
+    List<Contact> contacts;
+
     private String email;
     private String password;
 
@@ -26,4 +29,7 @@ public class User {
 
     @OneToMany
     List<Contact> blockedContacts;
+
+    @OneToMany
+    List<Contact> spammedContacts;
 }

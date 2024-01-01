@@ -1,14 +1,17 @@
 package com.TrueCaller.service;
 
+import com.TrueCaller.dto.UserPhoneRequestDTO;
+import com.TrueCaller.dto.UserPhoneResponseDTO;
 import com.TrueCaller.model.Contact;
 import com.TrueCaller.model.User;
 import com.TrueCaller.model.constants.ContactType;
+import org.springframework.http.ResponseEntity;
 
 public interface ContactService {
 
     Contact addContact(String phoneNumber, ContactType contactType);
 
-    void blockContact(Long userId, String phoneNumber);
+    ResponseEntity<UserPhoneResponseDTO> blockContact(UserPhoneRequestDTO userPhoneRequestDTO);
 
     void unblockContact(Long userId, String phoneNumber);
 

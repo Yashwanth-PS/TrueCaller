@@ -4,7 +4,6 @@ import com.TrueCaller.dto.UserPhoneRequestDTO;
 import com.TrueCaller.dto.UserPhoneResponseDTO;
 import com.TrueCaller.dto.UserRegisterRequestDTO;
 import com.TrueCaller.dto.UserRegisterResponseDTO;
-import com.TrueCaller.model.constants.ContactType;
 import com.TrueCaller.model.constants.UserType;
 import com.TrueCaller.service.ContactService;
 import com.TrueCaller.service.UserService;
@@ -25,9 +24,15 @@ public class UserController {
     @PostMapping("/user/registration")
     public ResponseEntity<UserRegisterResponseDTO> registerUser(@RequestBody UserRegisterRequestDTO userRegisterRequestDTO) {
         ResponseEntity<UserRegisterResponseDTO> response = userService.registerUser(userRegisterRequestDTO, UserType.NORMAL_USER);
-        contactService.addContact(userRegisterRequestDTO.getPhoneNumber(), ContactType.NORMAL);
         return response;
     }
+    /* POST: http://localhost:8181/api/users/user/registration
+    {
+        "name": "Yash",
+        "phoneNumber": "9876543210",
+        "email": "yash@example.com",
+        "password": "securePassword123"
+    } */
 
     @PostMapping("/manager/registration")
     public ResponseEntity<UserRegisterResponseDTO> registerManager(@RequestBody UserRegisterRequestDTO userRegisterRequestDTO) {
@@ -35,7 +40,12 @@ public class UserController {
     }
 
     @GetMapping("/user/identification")
-    public ResponseEntity<UserPhoneResponseDTO>  identifyUser(@RequestBody UserPhoneRequestDTO userPhoneRequestDTO) {
+    public ResponseEntity<UserPhoneResponseDTO> identifyUser(@RequestBody UserPhoneRequestDTO userPhoneRequestDTO) {
         return userService.identifyCaller(userPhoneRequestDTO);
     }
+    /* GET: http://localhost:8181/api/users/user/identification
+    {
+        "userId": "10",
+        "phoneNumber": "9876543210"
+    } */
 }
