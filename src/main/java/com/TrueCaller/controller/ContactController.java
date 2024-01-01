@@ -32,10 +32,21 @@ public class ContactController {
     public ResponseEntity<UserPhoneResponseDTO> unblockContact(@RequestBody UserPhoneRequestDTO userPhoneRequestDTO) {
         return contactService.unblockContact(userPhoneRequestDTO);
     }
-}
 
 /* http://localhost:8181/api/contacts/contact/block
 {
     "userId": "2",
     "phoneNumber": "9876543210"
 } */
+
+    @PostMapping("/contact/add")
+    public ResponseEntity<UserPhoneResponseDTO> addContact(@RequestBody UserPhoneRequestDTO userPhoneRequestDTO) {
+        return contactService.addContact(userPhoneRequestDTO);
+    }
+
+/* http://localhost:8181/api/contacts/contact/add
+{
+    "userId": "2",
+    "phoneNumber": "9876543211"
+} */
+}

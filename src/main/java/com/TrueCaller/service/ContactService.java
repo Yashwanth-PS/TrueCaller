@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 
 public interface ContactService {
 
-    Contact addContact(String phoneNumber, ContactType contactType);
+    ResponseEntity<UserPhoneResponseDTO> addContact(UserPhoneRequestDTO userPhoneRequestDTO);
 
     ResponseEntity<UserPhoneResponseDTO> blockContact(UserPhoneRequestDTO userPhoneRequestDTO);
 

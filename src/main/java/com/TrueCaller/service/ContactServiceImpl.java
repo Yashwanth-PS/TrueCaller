@@ -30,12 +30,24 @@ public class ContactServiceImpl implements ContactService {
     }
 
     @Override
-    public Contact addContact(String phoneNumber, ContactType contactType) {
+    public ResponseEntity<UserPhoneResponseDTO> addContact(UserPhoneRequestDTO userPhoneRequestDTO) {
         // Perform validation or additional logic if needed
-        Contact contact = new Contact();
-        contact.setPhoneNumber(phoneNumber);
-        contact.setContactType(contactType);
-        return contactRepository.save(contact);
+        UserPhoneResponseDTO responseDTO = new UserPhoneResponseDTO();
+        try {
+            Contact contact = new Contact();;
+            contact.setPhoneNumber(userPhoneRequestDTO.getPhoneNumber());
+            contact.setContactType(ContactType.NORMAL);
+            contactRepository.save(contact);
+            responseDTO.setName("Unregistered User");
+            responseDTO.setPhoneNumber(userPhoneRequestDTO.getPhoneNumber());
+            responseDTO.setResponseCode(200);
+            responseDTO.setResponseMessage("SUCCESS: Successfully Added the Contact");
+            return ResponseEntity.ok(responseDTO);
+        } catch (Exception e) {
+            responseDTO.setResponseCode(500);
+            responseDTO.setResponseMessage("Could Not Add the Contact");
+            return ResponseEntity.status(500).body(responseDTO);
+        }
     }
 
     @Override
