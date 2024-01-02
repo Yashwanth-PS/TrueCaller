@@ -2,6 +2,7 @@ package com.TrueCaller.service;
 
 import com.TrueCaller.dto.UserPhoneRequestDTO;
 import com.TrueCaller.dto.UserPhoneResponseDTO;
+import com.TrueCaller.exception.ContactAlreadySpammedException;
 import com.TrueCaller.exception.ContactNotFoundException;
 import com.TrueCaller.exception.IllegalOperationException;
 import com.TrueCaller.exception.UserNotFoundException;
@@ -34,7 +35,8 @@ public class ContactServiceImpl implements ContactService {
         // Perform validation or additional logic if needed
         UserPhoneResponseDTO responseDTO = new UserPhoneResponseDTO();
         try {
-            Contact contact = new Contact();;
+            Contact contact = new Contact();
+            ;
             contact.setPhoneNumber(userPhoneRequestDTO.getPhoneNumber());
             contact.setContactType(ContactType.NORMAL);
             contactRepository.save(contact);
@@ -108,14 +110,38 @@ public class ContactServiceImpl implements ContactService {
     }
 
     @Override
-    public void reportSpam(Long contactId) {
-        Optional<Contact> contactOptional = contactRepository.findById(contactId);
-        if (contactOptional.isEmpty()) {
-            throw new ContactNotFoundException("This Contact does not exist");
+    public ResponseEntity<UserPhoneResponseDTO> reportSpam(UserPhoneRequestDTO userPhoneRequestDTO) {
+        UserPhoneResponseDTO responseDTO = new UserPhoneResponseDTO();
+        try { // You may need to implement the actual logic based on your requirements
+            Optional<User> userOptional = userRepository.findById(userPhoneRequestDTO.getUserId());
+            if (userOptional.isEmpty()) {
+                throw new UserNotFoundException("This User does not exist");
+            }
+            Optional<Contact> contactOptional = contactRepository.findByPhoneNumber(userPhoneRequestDTO.getPhoneNumber());
+            if (contactOptional.isEmpty()) {
+                throw new ContactNotFoundException("This Contact does not exist");
+            }
+            if(userOptional.get().getSpammedContacts().contains(contactOptional.get())) {
+                if (contactOptional.isEmpty()) {
+                    throw new ContactAlreadySpammedException("This Contact is already spammed");
+                }
+            }
+            User user = userOptional.get();
+            user.getSpammedContacts().add(contactOptional.get());
+            Contact updatedSpamCount = contactOptional.get();
+            updatedSpamCount.setSpamCount(contactOptional.get().getSpamCount() + 1);
+            userRepository.save(user);
+            contactRepository.save(updatedSpamCount);
+            responseDTO.setName(updatedSpamCount.getUser().getName());
+            responseDTO.setPhoneNumber(userPhoneRequestDTO.getPhoneNumber());
+            responseDTO.setResponseCode(200);
+            responseDTO.setResponseMessage("SUCCESS: Successfully Reported the User as Spam");
+            return ResponseEntity.ok(responseDTO);
+        } catch (Exception e) {
+            responseDTO.setResponseCode(500);
+            responseDTO.setResponseMessage("Could Not Reported the User as Spam");
+            return ResponseEntity.status(500).body(responseDTO);
         }
-        Contact updatedSpamCount = contactOptional.get();
-        updatedSpamCount.setSpamCount(contactOptional.get().getSpamCount() + 1);
-        contactRepository.save(updatedSpamCount);
     }
 
     @Override
