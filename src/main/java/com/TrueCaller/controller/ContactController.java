@@ -49,4 +49,9 @@ public class ContactController {
     "userId": "2",
     "phoneNumber": "9876543211"
 } */
+
+    @PostMapping("/contact/reportspam")
+    public ResponseEntity<UserPhoneResponseDTO> reportSpam(@RequestBody UserPhoneRequestDTO userPhoneRequestDTO) {
+        return contactService.reportSpam(userPhoneRequestDTO);
+    }
 }
