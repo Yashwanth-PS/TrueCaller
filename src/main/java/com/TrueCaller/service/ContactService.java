@@ -15,7 +15,7 @@ public interface ContactService {
 
     ResponseEntity<UserPhoneResponseDTO> unblockContact(UserPhoneRequestDTO userPhoneRequestDTO);
 
-    void reportSpam(Long contactId);
+    ResponseEntity<UserPhoneResponseDTO> reportSpam(UserPhoneRequestDTO userPhoneRequestDTO);
 
     void blackListContact(Long userId, String phoneNumber);
 
