@@ -121,7 +121,7 @@ public class ContactServiceImpl implements ContactService {
             if (contactOptional.isEmpty()) {
                 throw new ContactNotFoundException("This Contact does not exist");
             }
-            if(userOptional.get().getSpammedContacts().contains(contactOptional.get())) {
+            if (userOptional.get().getSpammedContacts().contains(contactOptional.get())) {
                 if (contactOptional.isEmpty()) {
                     throw new ContactAlreadySpammedException("This Contact is already spammed");
                 }
@@ -145,21 +145,32 @@ public class ContactServiceImpl implements ContactService {
     }
 
     @Override
-    public void blackListContact(Long userId, String phoneNumber) {
-        Optional<User> userOptional = userRepository.findById(userId);
-        if (userOptional.isEmpty()) {
-            throw new UserNotFoundException("This User does not exist");
+    public ResponseEntity<UserPhoneResponseDTO> blackListContact(UserPhoneRequestDTO userPhoneRequestDTO) {
+        UserPhoneResponseDTO responseDTO = new UserPhoneResponseDTO();
+        try { // You may need to implement the actual logic based on your requirements
+            Optional<User> userOptional = userRepository.findById(userPhoneRequestDTO.getUserId());
+            if (userOptional.isEmpty()) {
+                throw new UserNotFoundException("This User does not exist");
+            }
+            User user = userOptional.get();
+            if (!user.getUserType().equals(UserType.CONTACT_MANAGER)) {
+                throw new IllegalOperationException("Only Contact Manager Can Blacklist a User");
+            }
+            Optional<Contact> contactOptional = contactRepository.findByPhoneNumber(userPhoneRequestDTO.getPhoneNumber());
+            if (contactOptional.isEmpty()) {
+                throw new ContactNotFoundException("This Contact does not exist");
+            }
+            Contact contact = contactOptional.get();
+            contact.setContactType(ContactType.BLACK_LISTED);
+            contactRepository.save(contact);
+            responseDTO.setPhoneNumber(userPhoneRequestDTO.getPhoneNumber());
+            responseDTO.setResponseCode(200);
+            responseDTO.setResponseMessage("SUCCESS: Successfully Reported the User as Spam");
+            return ResponseEntity.ok(responseDTO);
+        } catch (Exception e) {
+            responseDTO.setResponseCode(500);
+            responseDTO.setResponseMessage("Could Not Reported the User as Spam");
+            return ResponseEntity.status(500).body(responseDTO);
         }
-        User user = userOptional.get();
-        if (!user.getUserType().equals(UserType.CONTACT_MANAGER)) {
-            throw new IllegalOperationException("Only Contact Manager Can Blacklist a User");
-        }
-        Optional<Contact> contactOptional = contactRepository.findByPhoneNumber(phoneNumber);
-        if (contactOptional.isEmpty()) {
-            throw new ContactNotFoundException("This Contact does not exist");
-        }
-        Contact contact = contactOptional.get();
-        contact.setContactType(ContactType.BLACK_LISTED);
-        contactRepository.save(contact);
     }
 }
