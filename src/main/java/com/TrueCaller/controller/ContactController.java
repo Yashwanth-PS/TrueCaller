@@ -54,4 +54,9 @@ public class ContactController {
     public ResponseEntity<UserPhoneResponseDTO> reportSpam(@RequestBody UserPhoneRequestDTO userPhoneRequestDTO) {
         return contactService.reportSpam(userPhoneRequestDTO);
     }
+
+    @PostMapping("/contact/blacklist")
+    public ResponseEntity<UserPhoneResponseDTO> blackList(@RequestBody UserPhoneRequestDTO userPhoneRequestDTO) {
+        return contactService.blackListContact(userPhoneRequestDTO);
+    }
 }
